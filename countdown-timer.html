@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f9;
+      margin: 0;
+    }
+
+    .timer-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .timer {
+      font-size: 3rem;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="timer-container">
+    <h1>Countdown Timer</h1>
+    <div class="timer" id="timer">00:30</div>
+    <button onclick="startTimer()">Start Countdown</button>
+  </div>
+
+  <script>
+    let countdown;
+    let timeLeft =30; // 30 seconds
+
+    function startTimer() {
+      countdown = setInterval(function () {
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          document.getElementById('timer').textContent = "Time's up!";
+        } else {
+          timeLeft--;
+          const minutes = Math.floor(timeLeft / 60);
+          const seconds = timeLeft % 60;
+          document.getElementById('timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>
