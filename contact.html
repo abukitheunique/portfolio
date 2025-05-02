@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact | Abubeker Assefa</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #333333;
+    }
+
+    .header {
+      padding: 2rem;
+      background: #ffffff;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      color: #333333;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    nav ul li a {
+      color: #007BFF;
+      text-decoration: none;
+      transition: color 0.3s, transform 0.3s;
+      font-size: 1.1rem;
+    }
+
+    nav ul li a:hover {
+      color: #0056b3;
+      transform: scale(1.1);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    h2 {
+      color: #007BFF;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    input, textarea {
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #333;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      background: #007BFF;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #ffffff;
+      color: #888888;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      border-top: 2px solid #ddd;
+    }
+
+    .social-icons {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .social-icons a {
+      color: #5A5AFF;
+      font-size: 1.8rem;
+      border: 2px solid #5A5AFF;
+      border-radius: 50%;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    .social-icons a:hover {
+      background-color: #5A5AFF;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      main {
+        padding: 0 1rem;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <h1>Abubeker Assefa</h1>
+    <nav>
+      <ul>
+        <li><a href="homepage.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="skills.html">Skills</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Contact Me</h2>
+
+    <!-- ✅ FORM with ACTION -->
+    <form id="contactForm" action="https://script.google.com/macros/s/AKfycbzBbqqj3O_-GLSw1zbcH72Rwf4PMverF-plVChVgSLcEImTGimlvZWjtk-ZT1PjX8kj/exec" method="POST">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+
+    <p>OR</p>
+
+    <div class="social-icons">
+      <a href="https://www.linkedin.com/in/abubeker-assefa" target="_blank">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+      <a href="https://github.com/abukitheunique" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+      <a href="https://www.instagram.com/abukitheunique" target="_blank">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="mailto:abubekerassefayesuf@gmail.com" target="_blank">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2025 Abubeker Assefa</p>
+  </footer>
+  <script>
+    const form = document.getElementById('contactForm');
+    
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault(); 
+    
+      const formData = new FormData(form);
+      
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: formData
+        });
+    
+        if (response.ok) {
+          alert('Message sent successfully!');
+          form.reset();
+        } else {
+          alert('Something went wrong. Please try again.');
+        }
+      } catch (error) {
+        alert('Error sending message. Please check your internet connection.');
+      }
+    });
+    </script>
+    
+</body>
+</html>
