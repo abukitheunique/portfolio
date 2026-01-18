@@ -11,7 +11,8 @@ import {
   FaTelegram,
   FaPaperPlane,
   FaCheck,
-  FaSpinner
+  FaSpinner,
+  FaExclamationTriangle
 } from "react-icons/fa";
 
 type FormData = {
@@ -19,6 +20,8 @@ type FormData = {
   email: string;
   subject: string;
   message: string;
+  _replyto?: string; // For Formspree
+  _subject?: string; // For Formspree
 };
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
@@ -32,6 +35,10 @@ export default function Contact() {
   });
   
   const [status, setStatus] = useState<FormStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Your Formspree URL
+  const FORMSPREE_URL = "https://formspree.io/f/mojjerqp";
 
   const contactInfo = [
     {
@@ -46,7 +53,7 @@ export default function Contact() {
       icon: <FaPhone className="text-2xl" />,
       title: "Phone",
       value: "+251 943101360",
-      link: "tel:+2519XXXXXXXX",
+      link: "tel:+251943101360",
       color: "from-green-500/20 to-emerald-500/20",
       borderColor: "border-green-500/30",
     },
@@ -90,15 +97,42 @@ export default function Contact() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
-    
-    // Simulate API call
-    setTimeout(() => {
-      setStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      
-      // Reset status after 3 seconds
-      setTimeout(() => setStatus('idle'), 3000);
-    }, 1500);
+    setErrorMessage('');
+
+    try {
+      // Prepare data for Formspree
+      const formDataForSubmission = new FormData();
+      formDataForSubmission.append('name', formData.name);
+      formDataForSubmission.append('email', formData.email);
+      formDataForSubmission.append('subject', formData.subject);
+      formDataForSubmission.append('message', formData.message);
+      formDataForSubmission.append('_replyto', formData.email); // For Formspree reply-to
+      formDataForSubmission.append('_subject', `New message from ${formData.name}: ${formData.subject}`); // Email subject
+
+      const response = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        body: formDataForSubmission,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        
+        // Reset status after 5 seconds
+        setTimeout(() => setStatus('idle'), 5000);
+      } else {
+        const errorData = await response.json();
+        setStatus('error');
+        setErrorMessage(errorData.error || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setStatus('error');
+      setErrorMessage('Network error. Please check your connection and try again.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -167,7 +201,7 @@ export default function Contact() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-300">
-                        Your Name
+                        Your Name *
                       </label>
                       <input
                         type="text"
@@ -175,13 +209,14 @@ export default function Contact() {
                         value={formData.name}
                         onChange={handleChange}
                         required
+                        minLength={2}
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                         placeholder="John Doe"
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-300">
-                        Email Address
+                        Email Address *
                       </label>
                       <input
                         type="email"
@@ -189,6 +224,7 @@ export default function Contact() {
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                         placeholder="john@example.com"
                       />
@@ -197,7 +233,7 @@ export default function Contact() {
 
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-300">
-                      Subject
+                      Subject *
                     </label>
                     <input
                       type="text"
@@ -205,6 +241,7 @@ export default function Contact() {
                       value={formData.subject}
                       onChange={handleChange}
                       required
+                      minLength={5}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                       placeholder="Project Inquiry"
                     />
@@ -212,18 +249,46 @@ export default function Contact() {
 
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-300">
-                      Message
+                      Message *
                     </label>
                     <textarea
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       required
+                      minLength={10}
                       rows={5}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 resize-none"
                       placeholder="Tell me about your project..."
                     />
                   </div>
+
+                  {/* Status Messages */}
+                  {status === 'error' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3 text-red-400">
+                        <FaExclamationTriangle />
+                        <span>{errorMessage || 'Failed to send message. Please try again.'}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {status === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-green-500/20 border border-green-500/30 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3 text-green-400">
+                        <FaCheck />
+                        <span>Message sent successfully! I'll get back to you within 24 hours.</span>
+                      </div>
+                    </motion.div>
+                  )}
 
                   <motion.button
                     type="submit"
@@ -233,8 +298,10 @@ export default function Contact() {
                     className={`w-full py-4 px-8 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
                       status === 'success'
                         ? 'bg-gradient-to-r from-green-600 to-emerald-600'
+                        : status === 'error'
+                        ? 'bg-gradient-to-r from-red-600 to-orange-600'
                         : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30'
-                    }`}
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {status === 'submitting' ? (
                       <>
@@ -245,6 +312,11 @@ export default function Contact() {
                       <>
                         <FaCheck />
                         Message Sent!
+                      </>
+                    ) : status === 'error' ? (
+                      <>
+                        <FaExclamationTriangle />
+                        Try Again
                       </>
                     ) : (
                       <>
@@ -257,8 +329,11 @@ export default function Contact() {
 
                 <div className="mt-8 pt-8 border-t border-white/10">
                   <p className="text-gray-400 text-sm text-center">
-                    I typically respond within 24 hours. For urgent inquiries, 
+                    * Required fields. I typically respond within 24 hours. For urgent inquiries, 
                     please mention "URGENT" in your subject line.
+                  </p>
+                  <p className="text-gray-500 text-xs text-center mt-2">
+                    Messages are sent directly to my email via Formspree.
                   </p>
                 </div>
               </div>
